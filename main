@@ -1,0 +1,97 @@
+%% ARNG : Automatic Random NFT Generator
+% 
+% Aziz KABA
+% 16/12/2021
+% 21:06
+
+%%
+% This m file generates all the possibilities of layer combinations
+% to generate new NFTs
+% It takes four layers from photoshop such as background,base
+% template,textures etc. and combines 4 images into single one without
+% alpha blending!
+
+% You can add limitless png files under their folders and program
+% automatically uses all of the images. 
+
+% Your images must be under figs folder 
+% and grouped according to their layers
+% background (arkaplan) folder, texture (desen) folder etc.
+
+% Such as:
+
+% \figs\arkaplan 
+% \figs\desen
+
+
+% Thanks => https://stackoverflow.com/questions/44071832/how-to-fuse-multiple-images-in-matlab-without-the-images-fading-out
+
+close all
+clear
+clc
+
+%% 
+
+% You can edit file path below or you can create similar folders
+
+imageFiles1 = dir("figs\arkaplan\*.png");
+nofImages1 = length(imageFiles1);
+
+imageFiles2 = dir("figs\goz\*.png");
+nofImages2 = length(imageFiles2);
+
+imageFiles3 = dir("figs\kas\*.png");
+nofImages3 = length(imageFiles3);
+
+imageFiles4 = dir("figs\desen\*.png");
+nofImages4 = length(imageFiles4);
+
+for cnt1=1:nofImages1
+
+    currentFileName1 = imageFiles1(cnt1).name;
+    currentImage1 = imread([imageFiles1(cnt1).folder ,'\', currentFileName1]);
+
+    for cnt2=1:nofImages2
+
+        currentFileName2 = imageFiles2(cnt2).name;
+        currentImage2 = imread([imageFiles2(cnt2).folder ,'\', currentFileName2]);
+
+        for cnt3=1:nofImages3
+
+            currentFileName3 = imageFiles3(cnt3).name;
+            currentImage3 = imread([imageFiles3(cnt3).folder ,'\', currentFileName3]);
+
+            for cnt4=1:nofImages4
+
+                currentFileName4 = imageFiles4(cnt4).name;
+                currentImage4 = imread([imageFiles4(cnt4).folder ,'\', currentFileName4]);
+
+                imgSet = cat(4, currentImage1, currentImage2, currentImage3, currentImage4);
+
+                blankImage = mode(imgSet, 4);
+
+                sumImage = imgSet(:, :, :, 1);
+
+                for iImage = 2:size(imgSet, 4)
+
+                    temp = imgSet(:, :, :, iImage);
+
+                    mask = repmat(any((blankImage ~= temp), 3), [1 1 size(blankImage, 3)]);
+
+                    sumImage(mask) = temp(mask);
+
+                end
+
+                imshow(sumImage);
+
+                imwrite(sumImage,['\figs\output\',num2str(cnt1),num2str(cnt2),num2str(cnt3),num2str(cnt4),'Image.png']);
+
+            end
+
+        end
+
+    end
+
+end
+
+
